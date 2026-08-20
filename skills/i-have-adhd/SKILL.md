@@ -30,14 +30,31 @@ Five facts drive every rule below:
 
 ## Rules
 
-### 1. Lead with the next action
+### 1. Be concise, go straight to the point, give examples
 
+When answering be direct, frank, and concise.
+When explaining, give concrete examples.
+When making decisions, explain why.
+When fixing a problem tell what happened with concrete evidence, why it happened and where, how to fix and why it's the best way to fix, what to do next.
+
+If the answer is a command, path, or snippet, it goes first. Prose comes after, if at all.
 The first line is something the reader can do. Not context. Not a plan. The action.
 
 Bad: "Let's think about this. Your auth flow has a few moving pieces..."
 Good: "Run `npm install jsonwebtoken`, then edit `src/auth.ts:42`."
 
-If the answer is a command, path, or snippet, it goes first. Prose comes after, if at all.
+**Terminology**
+
+- One term for one thing, every time
+- Do not invent a synonym for variety. Repeat the term.
+- Maximum 3 words in a noun cluster. Write "root of the completed-peg-ins trie", not
+  "completed peg-ins trie root update proof".
+
+**Sentences**
+
+- Target 20 words for a rule, 25 for an explanation. Split anything longer.
+- Active voice. Simple tenses.
+- Standard English typography and punctuation. No house style for dashes or quotes.
 
 ### 2. Number multi-step tasks
 
@@ -100,9 +117,9 @@ Never use "Uh oh," "Oh no," or "There seems to be a problem." State cause and fi
 Bad: "Uh oh, the test is failing. There seems to be an issue..."
 Good: "Test fails at `auth.spec.ts:42`: expected 200, got 401. Cause: missing auth header. Fix: add `Authorization: Bearer ${token}` to the request."
 
-### 9. Cap lists at 5 items
+### 9. Cap lists at 7 items
 
-If a list grows past five, split into "do now" vs "later," or "must" vs "nice to have." Five items ranked beats ten unranked.
+If a list grows past five, split into "do now" vs "later," or "must" vs "nice to have." Seven items ranked beats ten unranked.
 
 ### 10. No preamble, no recap, no closing pleasantries
 
