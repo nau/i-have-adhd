@@ -12,6 +12,12 @@ flag_path="$claude_dir/.i-have-adhd-always"
 # Only fire when the user has opted in.
 [ -f "$flag_path" ] || exit 0
 
+# hooks.json runs this script with --fallback after the Node launcher. If Node
+# is on PATH, the launcher has already printed the ruleset, so print nothing.
+if [ "${1:-}" = "--fallback" ] && command -v node >/dev/null 2>&1; then
+  exit 0
+fi
+
 # $0 is the absolute script path substituted into hooks.json by Claude Code,
 # so resolve SKILL.md relative to it instead of trusting an exported env var.
 script_dir=$(dirname -- "$0")

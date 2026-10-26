@@ -53,10 +53,12 @@ class AlwaysOnHookTest(unittest.TestCase):
             env=env,
         )
 
-    def run_codex_hook(self, plugin_root=None):
+    def run_codex_hook(self, plugin_root=None, path=None):
         config = json.loads((ROOT / "hooks" / "hooks.json").read_text())
         hook = config["hooks"]["SessionStart"][0]["hooks"][0]
         env = os.environ.copy()
+        if path is not None:
+            env["PATH"] = path
         env["CLAUDE_CONFIG_DIR"] = str(self.config_dir)
         plugin_root = plugin_root or self.plugin_root
         env["CLAUDE_PLUGIN_ROOT"] = str(plugin_root)
@@ -142,6 +144,31 @@ class AlwaysOnHookTest(unittest.TestCase):
         self.assertEqual("", result.stderr)
         self.assertIn("ADHD MODE ACTIVE (always-on)", result.stdout)
 
+    def test_command_prints_the_ruleset_once_when_node_is_present(self):
+        if not shutil.which("node"):
+            self.skipTest("node is not on PATH")
+        (self.config_dir / ".i-have-adhd-always").touch()
+
+        result = self.run_codex_hook()
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(1, result.stdout.count("ADHD MODE ACTIVE (always-on)"))
+
+    def test_command_falls_back_to_sh_when_node_is_missing(self):
+        # Native Claude Code installs do not ship Node, so a POSIX machine can
+        # lack it. The sh fallback in the same command must still inject.
+        if os.name == "nt":
+            self.skipTest("POSIX shell fallback")
+        path = "/usr/bin:/bin"
+        if shutil.which("node", path=path):
+            self.skipTest("node is in the base PATH")
+        (self.config_dir / ".i-have-adhd-always").touch()
+
+        result = self.run_codex_hook(path=path)
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(1, result.stdout.count("ADHD MODE ACTIVE (always-on)"))
+
     def test_codex_command_is_silent_without_opt_in_flag(self):
         result = self.run_codex_hook()
 
@@ -167,6 +194,8 @@ class AlwaysOnHookTest(unittest.TestCase):
         self.assertIn("process.env.PLUGIN_ROOT", command)
         self.assertIn("await import", command)
         self.assertIn(".catch", command)
+        self.assertIn('; sh "${CLAUDE_PLUGIN_ROOT}/hooks/always-on.sh" --fallback', command)
+        self.assertTrue(command.endswith("; exit 0"))
 
 
 if __name__ == "__main__":
